@@ -5,9 +5,11 @@ function AddTodo() {
   const [data, setData] = useState([]);
   const [editId, setEditId] = useState(null);
   const [editText, setEditText] = useState("");
+  const [completedTasks, setCompletedTasks] = useState([])
 
   function changeHandler(e) {
     addText(e.target.value);
+    console.log(text)
   }
 
   function clickHandler(e) {
@@ -16,6 +18,7 @@ function AddTodo() {
       id: Date.now(),
       text: text
     };
+
     setData([...data, addedData]);
     addText("");
   }
@@ -39,21 +42,37 @@ function AddTodo() {
     setEditText("");
   }
 
+  function toggleComplete(id) {
+    if (completedTasks.includes(id)) {
+      setCompletedTasks(completedTasks.filter(taskId => taskId !== id))
+    }
+
+    else {
+      setCompletedTasks([...completedTasks, id])
+    }
+  }
+
   return (
     <div>
       <label htmlFor="">Add Task: </label>
+
       <input
         type="text"
         onChange={changeHandler}
         value={text}
         placeholder="Add a Task"
       />
+
       <button onClick={clickHandler}>Add</button>
 
       {data.map((inputvalue) => (
         <div key={inputvalue.id}>
           <div style={{ display: "flex", gap: "5px" }}>
-            <input type="checkbox" />
+            <input
+              type="checkbox"
+              checked={completedTasks.includes(inputvalue.id)}
+              onChange={() => toggleComplete(inputvalue.id)}
+            />
 
             {editId === inputvalue.id ? (
               <>
@@ -62,11 +81,17 @@ function AddTodo() {
                   value={editText}
                   onChange={(e) => setEditText(e.target.value)}
                 />
+
                 <button onClick={() => saveEditHandler(inputvalue.id)}>✅</button>
+
               </>
             ) : (
               <>
-                <p>{inputvalue.text}</p>
+                <p style={{
+                  textDecoration: completedTasks.includes(inputvalue.id)
+                    ? "line-through"
+                    : "none"
+                }}>{inputvalue.text}</p>
                 <button onClick={() => editHandler(inputvalue.id, inputvalue.text)}>✏️</button>
               </>
             )}
